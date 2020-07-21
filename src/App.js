@@ -11,22 +11,6 @@ export class App extends Component {
     loading: false,
   };
 
-  // componentDidMount = async () => {
-  //   this.setState({
-  //     loading: true,
-  //   });
-  //   const res = await axios.get(
-  //     `https://api.github.com/users?client_id=${process.env.REACT_APP_GIT_CLIENT_ID}&client_secret=${process.env.REACT_APP_GIT_CLIENT_SECRET}`
-  //   );
-  //   if (res.status === 200) {
-  //     return this.setState({
-  //       users: res.data,
-  //       loading: false,
-  //     });
-  //   }
-  //   return console.log(res.status);
-  // };
-
   searchUsers = async (search_query) => {
     this.setState({
       loading: true,
@@ -43,12 +27,23 @@ export class App extends Component {
     return console.log(res.status);
   };
 
+  clearUsers = () => {
+    this.setState({
+      users: [],
+      loading: false,
+    });
+  };
+
   render() {
     return (
       <div className='App'>
         <Navbar title='Github-Finder' icon='fab fa-github' />
         <div className='container'>
-          <Search searchUsers={this.searchUsers} />
+          <Search
+            searchUsers={this.searchUsers}
+            clearUsers={this.clearUsers}
+            showClear={this.state.users.length > 0 ? true : false}
+          />
           <UsersList loading={this.state.loading} users={this.state.users} />
         </div>
       </div>

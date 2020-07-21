@@ -1,8 +1,15 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
 
 export class Search extends Component {
   state = {
     search_query: "",
+  };
+
+  static propTypes = {
+    searchUsers: PropTypes.func.isRequired,
+    clearUsers: PropTypes.func.isRequired,
+    showClear: PropTypes.bool.isRequired,
   };
 
   onInput = (event) => {
@@ -34,6 +41,14 @@ export class Search extends Component {
             className='btn btn-dark btn-block'
           />
         </form>
+        {this.props.showClear && (
+          <input
+            type='button'
+            value='clear'
+            className='btn btn-light btn-block'
+            onClick={this.props.clearUsers}
+          />
+        )}
       </div>
     );
   }
