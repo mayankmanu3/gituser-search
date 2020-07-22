@@ -4,11 +4,13 @@ import Navbar from "./Component/Layout/Navbar";
 import UsersList from "./Component/Users/UsersList";
 import axios from "axios";
 import Search from "./Component/Search/Search";
+import { Alert } from "./Component/Layout/Alert";
 
 export class App extends Component {
   state = {
     users: [],
     loading: false,
+    alert: null,
   };
 
   searchUsers = async (search_query) => {
@@ -34,17 +36,32 @@ export class App extends Component {
     });
   };
 
+  setAlert = (message, type) => {
+    this.setState({
+      alert: {
+        message,
+        type,
+      },
+    });
+    setTimeout(() => {
+      this.setState({ alert: null });
+    }, 2000);
+  };
+
   render() {
+    const { loading, users, alert } = this.state;
     return (
       <div className='App'>
         <Navbar title='Github-Finder' icon='fab fa-github' />
         <div className='container'>
+          <Alert alert={alert} />
           <Search
             searchUsers={this.searchUsers}
             clearUsers={this.clearUsers}
-            showClear={this.state.users.length > 0 ? true : false}
+            showClear={users.length > 0 ? true : false}
+            setAlert={this.setAlert}
           />
-          <UsersList loading={this.state.loading} users={this.state.users} />
+          <UsersList loading={loading} users={users} />
         </div>
       </div>
     );
