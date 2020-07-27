@@ -12,6 +12,7 @@ import About from "./Pages/About";
 export class App extends Component {
   state = {
     users: [],
+    repos: [],
     user: {},
     loading: false,
     alert: null,
@@ -49,6 +50,22 @@ export class App extends Component {
     return console.log(res.status);
   };
 
+  getUserRepos = async (username) => {
+    this.setState({
+      loading: true,
+    });
+    const res = await axios.get(
+      `https://api.github.com/users/${username}/repos?per_page=5&sort=created:asc&client_id=${process.env.REACT_APP_GIT_CLIENT_ID}&client_secret=${process.env.REACT_APP_GIT_CLIENT_SECRET}`
+    );
+    if (res.status === 200) {
+      return this.setState({
+        repos: res.data,
+        loading: false,
+      });
+    }
+    return console.log(res.status);
+  };
+
   clearUsers = () => {
     this.setState({
       users: [],
@@ -69,7 +86,7 @@ export class App extends Component {
   };
 
   render() {
-    const { loading, users, alert, user } = this.state;
+    const { loading, users, alert, user, repos } = this.state;
     return (
       <Router>
         <div className='App'>
@@ -102,6 +119,8 @@ export class App extends Component {
                     getUser={this.getUser}
                     user={user}
                     loading={loading}
+                    getUserRepos={this.getUserRepos}
+                    repos={repos}
                   />
                 )}
               />
