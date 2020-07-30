@@ -8,6 +8,7 @@ import axios from "axios";
 import Search from "./Component/Search/Search";
 import Alert from "./Component/Layout/Alert";
 import About from "./Pages/About";
+import GithubState from "./Context/Github/GithubState";
 
 export const App = () => {
   const [users, setUsers] = useState([]);
@@ -16,27 +17,13 @@ export const App = () => {
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState(null);
 
-  const searchUsers = async (search_query) => {
-    setLoading(true);
-    const res = await axios.get(
-      `https://api.github.com/search/users?q=${search_query}&client_id=${process.env.REACT_APP_GIT_CLIENT_ID}&client_secret=${process.env.REACT_APP_GIT_CLIENT_SECRET}`
-    );
-    if (res.status === 200) {
-      setUsers(res.data.items);
-      setLoading(false);
-    }
-    return console.log(res.status);
-  };
-
   const getUser = async (username) => {
     setLoading(true);
     const res = await axios.get(
       `https://api.github.com/users/${username}?client_id=${process.env.REACT_APP_GIT_CLIENT_ID}&client_secret=${process.env.REACT_APP_GIT_CLIENT_SECRET}`
     );
-    if (res.status === 200) {
-      return setUser(res.data), setLoading(false);
-    }
-    return console.log(res.status);
+    setUser(res.data);
+    setLoading(false);
   };
 
   const getUserRepos = async (username) => {
@@ -44,10 +31,8 @@ export const App = () => {
     const res = await axios.get(
       `https://api.github.com/users/${username}/repos?per_page=5&sort=created:asc&client_id=${process.env.REACT_APP_GIT_CLIENT_ID}&client_secret=${process.env.REACT_APP_GIT_CLIENT_SECRET}`
     );
-    if (res.status === 200) {
-      return setRepos(res.data), setLoading(false);
-    }
-    return console.log(res.status);
+    setRepos(res.data);
+    setLoading(false);
   };
 
   const clearUsers = () => {
@@ -63,46 +48,47 @@ export const App = () => {
   };
 
   return (
-    <Router>
-      <div className='App'>
-        <Navbar title='Github-Finder' icon='fab fa-github' />
-        <div className='container'>
-          <Alert alert={alert} />
-          <Switch>
-            <Route
-              exact
-              path='/'
-              render={(props) => (
-                <Fragment>
-                  <Search
-                    searchUsers={searchUsers}
-                    clearUsers={clearUsers}
-                    showClear={users.length > 0 ? true : false}
-                    setAlert={showAlert}
+    <GithubState>
+      <Router>
+        <div className='App'>
+          <Navbar title='Github-Finder' icon='fab fa-github' />
+          <div className='container'>
+            <Alert alert={alert} />
+            <Switch>
+              <Route
+                exact
+                path='/'
+                render={(props) => (
+                  <Fragment>
+                    <Search
+                      clearUsers={clearUsers}
+                      showClear={users.length > 0 ? true : false}
+                      setAlert={showAlert}
+                    />
+                    <UsersList />
+                  </Fragment>
+                )}
+              />
+              <Route exact path='/about' component={About} />
+              <Route
+                exact
+                path='/user/:username'
+                render={(props) => (
+                  <User
+                    {...props}
+                    getUser={getUser}
+                    user={user}
+                    loading={loading}
+                    getUserRepos={getUserRepos}
+                    repos={repos}
                   />
-                  <UsersList loading={loading} users={users} />
-                </Fragment>
-              )}
-            />
-            <Route exact path='/about' component={About} />
-            <Route
-              exact
-              path='/user/:username'
-              render={(props) => (
-                <User
-                  {...props}
-                  getUser={getUser}
-                  user={user}
-                  loading={loading}
-                  getUserRepos={getUserRepos}
-                  repos={repos}
-                />
-              )}
-            />
-          </Switch>
+                )}
+              />
+            </Switch>
+          </div>
         </div>
-      </div>
-    </Router>
+      </Router>
+    </GithubState>
   );
 };
 
