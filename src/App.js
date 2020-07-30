@@ -4,25 +4,13 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Navbar from "./Component/Layout/Navbar";
 import UsersList from "./Component/Users/UsersList";
 import User from "./Component/Users/User";
-import axios from "axios";
 import Search from "./Component/Search/Search";
 import Alert from "./Component/Layout/Alert";
 import About from "./Pages/About";
 import GithubState from "./Context/Github/GithubState";
 
 export const App = () => {
-  const [repos, setRepos] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState(null);
-
-  const getUserRepos = async (username) => {
-    setLoading(true);
-    const res = await axios.get(
-      `https://api.github.com/users/${username}/repos?per_page=5&sort=created:asc&client_id=${process.env.REACT_APP_GIT_CLIENT_ID}&client_secret=${process.env.REACT_APP_GIT_CLIENT_SECRET}`
-    );
-    setRepos(res.data);
-    setLoading(false);
-  };
 
   const showAlert = (message, type) => {
     setAlert({ message, type });
@@ -50,13 +38,7 @@ export const App = () => {
                 )}
               />
               <Route exact path='/about' component={About} />
-              <Route
-                exact
-                path='/user/:username'
-                render={(props) => (
-                  <User {...props} getUserRepos={getUserRepos} repos={repos} />
-                )}
-              />
+              <Route exact path='/user/:username' component={User} />
             </Switch>
           </div>
         </div>
